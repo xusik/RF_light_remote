@@ -1,0 +1,1 @@
+"./Enrf24.o" "./RF_light_remote.o" -Wl,--start-group -l"lpmsp430g2553_SPI" -l"lpmsp430g2553_core" -l"m" -Wl,--end-group 
