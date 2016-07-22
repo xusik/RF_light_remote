@@ -1,6 +1,9 @@
 # RF light remote button
 Simple button :)
 
+Resources used:
+  - https://github.com/spirilis/Enrf24
+
 #####nRF24L01 - MSP430 pinout
                   +-\/-+
            VCC   1|    |20  GND
