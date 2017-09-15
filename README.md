@@ -4,7 +4,7 @@ Simple button :)
 Resources used:
   - https://github.com/spirilis/Enrf24
 
-#####nRF24L01 - MSP430 pinout
+nRF24L01 - MSP430 pinout
                   +-\/-+
            VCC   1|    |20  GND
            P1.0  2|    |19  XIN
