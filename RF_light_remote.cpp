@@ -10,6 +10,12 @@
 // 	   	 	 4  CSN P2.1  9|    |12  P2.4
 //		 	 8  IRQ P2.2 10|    |11  P2.3
 // 			               +----+
+//
+//  tb/tgb1{"s":"1"}
+//  tb/tgb1{"s":"0"}
+//
+//
+
 #include "Enrf24.h"
 #include "nRF24L01.h"
 #include <string.h>
