@@ -1,15 +1,15 @@
-// 	                               +-\/-+
-// 	                        VCC   1|    |20  GND
-// 	                        P1.0  2|    |19  XIN
-// 	                        P1.1  3|    |18  XOUT
-// 	                        P1.2  4|    |17  TEST
-// 	                 BUTTON P1.3  5|    |16  RST#
-// 	                        P1.4  6|    |15  P1.7 MOSI  6
-// 	                 5  SCK P1.5  7|    |14  P1.6 MISO  7
-// 	                 3   CE P2.0  8|    |13  P2.5
-// 	   	 	 4  CSN P2.1  9|    |12  P2.4
-//		 	 8  IRQ P2.2 10|    |11  P2.3
-// 			               +----+
+//                                  +-\/-+
+//                          VCC   1|    |20  GND
+//                          P1.0  2|    |19  XIN
+//                          P1.1  3|    |18  XOUT
+//                          P1.2  4|    |17  TEST
+//                   BUTTON P1.3  5|    |16  RST#
+//                          P1.4  6|    |15  P1.7 MOSI  6
+//                   5  SCK P1.5  7|    |14  P1.6 MISO  7
+//                   3   CE P2.0  8|    |13  P2.5
+//                   4  CSN P2.1  9|    |12  P2.4
+//                   8  IRQ P2.2 10|    |11  P2.3
+//                                 +----+
 //
 //  tb/tgb1{"s":"1"}
 //  tb/tgb1{"s":"0"}
@@ -29,9 +29,11 @@ const uint8_t txaddr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x01 };
 
 volatile int push_flag = LOW;
 
-const char *str_change = "CHANGE";
+const char *str_on = "tb/tgb1{\"s\":\"1\"}";
+const char *str_off = "tb/tgb1{\"s\":\"0\"}";
 int button_now_pressed, msp_ps = 0;
 unsigned long work_time = 0;
+bool toggle = 0;
 
 void power_savings ();
 void ps_out();
@@ -52,48 +54,55 @@ void setup() {
 
 void loop() {
 
-	if (push_flag) {
+  if (push_flag) {
 
-		work_time = millis();
+    work_time = millis();
 
-		button_now_pressed = !digitalRead(PUSH2);
+    button_now_pressed = !digitalRead(PUSH2);
 
-		delay(10);
+    delay(10);
 
-		if (button_now_pressed + !digitalRead(PUSH2) == 2){
-			delay(100);
-			if (button_now_pressed + !digitalRead(PUSH2) == 2){
-				  radio.print(str_change);
-				  radio.flush();  //
-			}
-		}
+    if (button_now_pressed + !digitalRead(PUSH2) == 2) {
+      delay(100);
+      if (button_now_pressed + !digitalRead(PUSH2) == 2) {
+        if (toggle == 0) {
+          radio.print(str_off);
+          toggle = 1;
+        }
+        else {
+          radio.print(str_on);
+          toggle = 0;
+        }
+        radio.flush();  //
+      }
+    }
 
-		push_flag = LOW;
-		button_now_pressed = 0;
-	}
+    push_flag = LOW;
+    button_now_pressed = 0;
+  }
 
-	msp_ps =  millis() - work_time;
-	if (msp_ps > 500){ power_savings (); }
+  msp_ps =  millis() - work_time;
+  if (msp_ps > 500) {
+    power_savings ();
+  }
 }
 
-void ps_out(){
-	push_flag = HIGH;
-	if (stay_asleep == true){
-		wakeup();
-		SPI.begin();
-		SPI.setDataMode(SPI_MODE0);
-		SPI.setBitOrder(MSBFIRST);
-		radio.begin();  // Defaults 1Mbps, channel 0, max TX power
-		radio.setChannel (120);
-		radio.setTXaddress((void*)txaddr);
-	}
+void ps_out() {
+  push_flag = HIGH;
+  if (stay_asleep == true) {
+    wakeup();
+    SPI.begin();
+    SPI.setDataMode(SPI_MODE0);
+    SPI.setBitOrder(MSBFIRST);
+    radio.begin();  // Defaults 1Mbps, channel 0, max TX power
+    radio.setChannel (120);
+    radio.setTXaddress((void*)txaddr);
+  }
 }
 
-void power_savings (){
-	attachInterrupt(PUSH2, ps_out, FALLING);
-	radio.deepsleep();
-	suspend();
+void power_savings () {
+  attachInterrupt(PUSH2, ps_out, FALLING);
+  radio.deepsleep();
+  suspend();
 }
-
-
 
